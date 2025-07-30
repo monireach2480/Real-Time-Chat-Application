@@ -1,5 +1,8 @@
 # Full-Stack Real-Time Chat Application
 
+
+![Chat App Screenshot](./image.png)
+
 ## Overview
 A real-time chat application built with the MERN stack, featuring user authentication, real-time messaging, and online status tracking.
 
