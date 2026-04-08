@@ -4,10 +4,17 @@ import express from "express";
 
 const app = express();
 const server = http.createServer(app);
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const allowedOrigins = CLIENT_URL.split(",").map((origin) => origin.trim());
+const SOCKET_PATH =
+  process.env.SOCKET_IO_PATH ||
+  (process.env.NODE_ENV === "development" ? "/socket.io" : "/_/backend/socket.io");
 
 const io = new Server(server, {
+  path: SOCKET_PATH,
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: process.env.NODE_ENV === "development" ? ["http://localhost:5173"] : allowedOrigins,
+    credentials: true,
   },
 });
 
