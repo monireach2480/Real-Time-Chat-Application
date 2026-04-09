@@ -17,6 +17,12 @@ const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const allowedOrigins = CLIENT_URL.split(",").map((origin) => origin.trim());
+const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET"];
+const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(", ")}`);
+}
 
 app.use(express.json());
 app.use(cookieParser());
@@ -29,6 +35,9 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
@@ -38,7 +47,16 @@ if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
   });
 }
 
-server.listen(PORT, () => {
-  console.log("server is running on PORT:" + PORT);
-  connectDB();
+server.listen(PORT, async () => {
+  if (missingEnvVars.length > 0) {
+    process.exit(1);
+  }
+
+  try {
+    await connectDB();
+    console.log("server is running on PORT:" + PORT);
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
 });

@@ -43,6 +43,10 @@ export const signup = async (req, res) => {
     }
   } catch (error) {
     console.log("Error in signup controller", error.message);
+    if (error.message === "JWT_SECRET is not set") {
+      return res.status(500).json({ message: "Server auth configuration error" });
+    }
+
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -71,6 +75,10 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
+    if (error.message === "JWT_SECRET is not set") {
+      return res.status(500).json({ message: "Server auth configuration error" });
+    }
+
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
